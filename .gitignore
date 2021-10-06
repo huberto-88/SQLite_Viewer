@@ -1,0 +1,7 @@
+# Project exclude paths
+/.gradle/
+/SQLite Viewer/task/build/
+/SQLite Viewer/task/out/
+/SQLite Viewer/task/out/production/classes/
+/Topics/Relational operators/Check the value/out/
+/Topics/Relational operators/Check the value/out/production/classes/
