@@ -3,12 +3,16 @@ package viewer;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class SQLiteViewer extends JFrame {
     private final JTextField textFieldFileName;
     private final JComboBox comboBox;
+    private final JButton buttonExecute;
     private JTextArea queryTextArea;
     private JTable table;
+    private TableModel tableModel;
 
     private DatabaseManagement databaseManagement;
 
@@ -57,9 +61,7 @@ public class SQLiteViewer extends JFrame {
 
         JButton buttonOpenFile = new JButton("Open");
         buttonOpenFile.setName("OpenFileButton");
-        buttonOpenFile.addActionListener(
-                e -> readNewTable()
-        );
+        buttonOpenFile.addActionListener(e -> readNewTable());
         north.add(buttonOpenFile);
 
         /*
@@ -77,20 +79,26 @@ public class SQLiteViewer extends JFrame {
         queryTextArea = new JTextArea();
         queryTextArea.setName("QueryTextArea");
         queryTextArea.setPreferredSize(new Dimension(550, 150));
+        queryTextArea.setEnabled(false);
         center.add(queryTextArea);
 
-        JButton buttonExecute = new JButton("Execute");
+        buttonExecute = new JButton("Execute");
         buttonExecute.setName("ExecuteQueryButton");
         buttonExecute.setPreferredSize(new Dimension(100, 40));
+        buttonExecute.setEnabled(false);
         buttonExecute.addActionListener(e -> {
-            databaseManagement.setRequest(queryTextArea.getText());
-            TableModel tableModel = new TableSqlData(
-                    databaseManagement.getColumnNames(),
-                    databaseManagement.getData()
-            );
+            try {
+                databaseManagement.setRequest(queryTextArea.getText());
+                SwingUtilities.updateComponentTreeUI(this);
+                tableModel = new TableSqlData(
+                        databaseManagement.getColumnNames(),
+                        databaseManagement.getData()
+                );
+                table.setModel(tableModel);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(new Frame(), "ERROR");
+            }
 
-            table.setModel(tableModel);
-            SwingUtilities.updateComponentTreeUI(this);
         });
         center.add(buttonExecute);
 
@@ -98,7 +106,7 @@ public class SQLiteViewer extends JFrame {
         table.setName("Table");
 
         JScrollPane scrollPaneTable = new JScrollPane(table);
-        scrollPaneTable.setPreferredSize(new Dimension(550, 220));
+        scrollPaneTable.setPreferredSize(new Dimension(650, 220));
         scrollPaneTable.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         center.add(scrollPaneTable);
 
@@ -110,13 +118,19 @@ public class SQLiteViewer extends JFrame {
 
     private void readNewTable() {
         String fileName = textFieldFileName.getText();
-
-        if (!fileName.equals("")) {
             comboBox.removeAllItems();
-            databaseManagement = new DatabaseManagement(fileName);
-            databaseManagement.getTablesNames()
-                    .forEach(comboBox::addItem);
-        }
+            queryTextArea.setText("");
+            queryTextArea.setEnabled(false);
+            buttonExecute.setEnabled(false);
+            try {
+                databaseManagement = new DatabaseManagement(fileName);
+                databaseManagement.getTablesNames()
+                        .forEach(comboBox::addItem);
+                queryTextArea.setEnabled(true);
+                buttonExecute.setEnabled(true);
+            } catch (FileNotFoundException | SQLException fileNotFoundException) {
+                JOptionPane.showMessageDialog(new Frame(), "File doesn't exist!");
+            }
         queryTextArea.removeAll();
     }
 

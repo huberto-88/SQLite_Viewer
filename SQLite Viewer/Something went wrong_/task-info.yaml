@@ -528,9 +528,22 @@ files:
         }
     }
   learner_created: true
+- name: asf
+  visible: true
+  learner_created: true
+- name: asfasdf
+  visible: true
+  learner_created: true
+- name: secondDatabase.db
+  visible: true
+  learner_created: true
+- name: firstDatabase.db
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/171/stages/888/implement#comment
-status: Failed
+status: Solved
 feedback:
-  message: Compilation Failed
-  time: Wed, 06 Oct 2021 11:59:34 UTC
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Wed, 06 Oct 2021 15:13:44 UTC
 record: -1

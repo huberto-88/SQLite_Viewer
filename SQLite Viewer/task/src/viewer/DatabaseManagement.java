@@ -2,6 +2,8 @@ package viewer;
 
 import org.sqlite.SQLiteDataSource;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -10,23 +12,24 @@ public class DatabaseManagement {
     private ArrayList<String> columnNames;
     private ArrayList<ArrayList<String>> tableContent;
 
-    public DatabaseManagement(String fileName) {
-        String url = "jdbc:sqlite:" + fileName;
-    //    url = "jdbc:sqlite:C:/Users/Hubert/SQLite Viewer/SQLite Viewer/task/" + fileName;
-        dataSource.setUrl(url);
+    public DatabaseManagement(String fileName) throws FileNotFoundException {
+        String path = "C:/Users/Hubert/SQLite Viewer/SQLite Viewer/task/" + fileName;
+        if (new File(path).exists()) {
+            String url = "jdbc:sqlite:" + path;
+            url = "jdbc:sqlite:" + path;
+            dataSource.setUrl(url);
+        } else {
+            throw new FileNotFoundException();
+        }
     }
 
-    private Connection getConnection() {
+    private Connection getConnection() throws SQLException {
         Connection connection = null;
-        try {
             connection = dataSource.getConnection();
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
         return connection;
     }
 
-    public ArrayList<String> getTablesNames() {
+    public ArrayList<String> getTablesNames() throws SQLException {
         String sqlQuery = "SELECT * FROM sqlite_master where type = 'table';";
         ArrayList<String> tablesNames = new ArrayList<>();
 
@@ -35,16 +38,12 @@ public class DatabaseManagement {
                 while (resultSet.next()) {
                     tablesNames.add(resultSet.getString("name"));
                 }
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
             }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
         }
         return tablesNames;
     }
 
-    public void setRequest(String request) {
+    public void setRequest(String request) throws SQLException {
         columnNames = new ArrayList<>();
         tableContent = new ArrayList<>();
 
@@ -63,8 +62,6 @@ public class DatabaseManagement {
                     tableContent.add(colContent);
                 }
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
     }
 
